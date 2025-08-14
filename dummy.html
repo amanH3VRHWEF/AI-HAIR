@@ -1,0 +1,1349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Hair Studio - Professional Edition</title>
+<style>
+/* === ADVANCED NEON BLACK/GOLD THEME === */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: linear-gradient(45deg, #000000, #1a1a1a);
+    color: white;
+    font-family: 'Arial', sans-serif;
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* === ANIMATED BACKGROUND === */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        radial-gradient(circle at 20% 30%, rgba(255, 215, 0, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(255, 215, 0, 0.1) 0%, transparent 50%);
+    animation: bgPulse 4s ease-in-out infinite alternate;
+    pointer-events: none;
+    z-index: -1;
+}
+
+@keyframes bgPulse {
+    0% { opacity: 0.5; }
+    100% { opacity: 0.8; }
+}
+
+/* === NAVIGATION BAR === */
+.nav-bar {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    backdrop-filter: blur(10px);
+    border-bottom: 2px solid gold;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 1000;
+}
+
+.nav-btn {
+    padding: 10px 20px;
+    border: 2px solid gold;
+    background: transparent;
+    color: white;
+    cursor: pointer;
+    border-radius: 25px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    text-shadow: 0 0 5px gold;
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+}
+
+.nav-btn:hover {
+    background: gold;
+    color: black;
+    transform: scale(1.05);
+    box-shadow: 0 0 20px gold;
+}
+
+.logo {
+    font-size: 20px;
+    font-weight: bold;
+    color: gold;
+    text-shadow: 0 0 10px gold;
+}
+
+/* === MAIN SCREENS === */
+.screen {
+    display: none;
+    min-height: 100vh;
+    padding-top: 80px;
+}
+
+.screen.active {
+    display: block;
+}
+
+/* === WELCOME SCREEN === */
+#welcomeScreen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 20px;
+}
+
+.welcome-title {
+    font-size: 3.5em;
+    margin-bottom: 20px;
+    background: linear-gradient(45deg, gold, white, gold);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 30px gold;
+    animation: titleGlow 2s ease-in-out infinite alternate;
+}
+
+@keyframes titleGlow {
+    0% { filter: brightness(1); }
+    100% { filter: brightness(1.3); }
+}
+
+.welcome-subtitle {
+    font-size: 1.3em;
+    margin-bottom: 40px;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.start-btn {
+    padding: 20px 50px;
+    font-size: 1.5em;
+    border: 3px solid gold;
+    background: linear-gradient(45deg, transparent, rgba(255, 215, 0, 0.1));
+    color: white;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+    animation: btnPulse 2s ease-in-out infinite;
+}
+
+@keyframes btnPulse {                                              
+    0%, 100% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.5); }
+    50% { box-shadow: 0 0 40px rgba(255, 215, 0, 0.8); }
+}
+
+.start-btn:hover {
+    background: gold;
+    color: black;
+    transform: scale(1.1);
+}
+
+/* === FACE SCAN SCREEN === */
+#faceScanScreen {
+    text-align: center;
+    padding: 20px;
+}
+
+.scan-container {
+    max-width: 600px;
+    margin: 40px auto;
+    position: relative;
+}
+
+#videoContainer {
+    position: relative;
+    width: 400px;
+    height: 400px;
+    margin: 20px auto;
+    border: 3px solid gold;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 0 30px gold;
+}
+
+#video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.scanning-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.scan-line {
+    position: absolute;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, transparent, #00ff00, transparent);
+    box-shadow: 0 0 20px #00ff00;
+    animation: scanMove 2s linear infinite;
+    display: none;
+}
+
+@keyframes scanMove {
+    0% { top: 0; }
+    100% { top: 100%; }
+}
+
+.face-detection-box {
+    position: absolute;
+    border: 3px solid #00ff00;
+    box-shadow: 0 0 15px #00ff00;
+    animation: detectPulse 1s ease-in-out infinite;
+    display: none;
+}
+
+@keyframes detectPulse {
+    0%, 100% { opacity: 0.7; }
+    50% { opacity: 1; }
+}
+
+.scan-controls {
+    margin: 30px 0;
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.scan-status {
+    font-size: 1.2em;
+    margin: 20px 0;
+    color: gold;
+    min-height: 30px;
+}
+
+/* === FACE SHAPE SELECTION === */
+.face-shape-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 30px;
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 20px;
+}
+
+.face-shape-card {
+    background: rgba(255, 215, 0, 0.1);
+    border: 2px solid gold;
+    border-radius: 15px;
+    padding: 30px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.face-shape-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255, 215, 0, 0.1), transparent);
+    transform: rotate(-45deg);
+    transition: all 0.5s ease;
+    opacity: 0;
+}
+
+.face-shape-card:hover::before {
+    opacity: 1;
+    animation: shimmer 1.5s ease-in-out;
+}
+
+@keyframes shimmer {
+    0% { transform: translateX(-100%) translateY(-100%) rotate(-45deg); }
+    100% { transform: translateX(100%) translateY(100%) rotate(-45deg); }
+}
+
+.face-shape-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 30px rgba(255, 215, 0, 0.4);
+    border-color: #fff;
+}
+
+.face-shape-icon {
+    font-size: 3em;
+    margin-bottom: 15px;
+    color: gold;
+}
+
+.face-shape-card h3 {
+    margin-bottom: 10px;
+    font-size: 1.3em;
+}
+
+.face-shape-card p {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.9em;
+}
+
+/* === 3D MODEL CONTAINER === */
+#modelContainer {
+    width: 100%;
+    height: 50vh;
+    position: relative;
+    background: radial-gradient(circle, rgba(255, 215, 0, 0.1), transparent);
+    border: 2px solid rgba(255, 215, 0, 0.3);
+    margin: 20px 0;
+    border-radius: 10px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.model-controls {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    display: flex;
+    gap: 10px;
+    z-index: 100;
+}
+
+.control-btn {
+    width: 40px;
+    height: 40px;
+    border: 1px solid gold;
+    background: rgba(0, 0, 0, 0.7);
+    color: gold;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.control-btn:hover {
+    background: gold;
+    color: black;
+}
+
+/* === HAIRSTYLE LOBBY === */
+.filters-section {
+    background: rgba(0, 0, 0, 0.8);
+    padding: 20px;
+    margin: 20px 0;
+    border-radius: 15px;
+    border: 1px solid gold;
+}
+
+.filter-group {
+    margin: 15px 0;
+}
+
+.filter-group h4 {
+    color: gold;
+    margin-bottom: 10px;
+}
+
+.filter-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.filter-btn {
+    padding: 8px 15px;
+    border: 1px solid rgba(255, 215, 0, 0.5);
+    background: transparent;
+    color: white;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.9em;
+}
+
+.filter-btn.active {
+    background: gold;
+    color: black;
+}
+
+.filter-btn:hover {
+    border-color: gold;
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+}
+
+/* === HAIRSTYLE CATEGORIES === */
+.category-section {
+    margin: 30px 0;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.category-header {
+    background: linear-gradient(45deg, rgba(255, 215, 0, 0.2), rgba(255, 215, 0, 0.1));
+    padding: 15px 20px;
+    border-bottom: 1px solid gold;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+
+.category-header:hover {
+    background: linear-gradient(45deg, rgba(255, 215, 0, 0.3), rgba(255, 215, 0, 0.2));
+}
+
+.category-title {
+    font-size: 1.3em;
+    font-weight: bold;
+    color: gold;
+}
+
+.category-count {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9em;
+}
+
+.expand-icon {
+    transition: transform 0.3s ease;
+    color: gold;
+}
+
+.expanded .expand-icon {
+    transform: rotate(180deg);
+}
+
+.category-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.5s ease;
+}
+
+.expanded .category-content {
+    max-height: 1000px;
+}
+
+/* === HAIRSTYLE GRID === */
+.hairstyle-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 20px;
+    padding: 20px;
+}
+
+.hairstyle-card {
+    background: rgba(0, 0, 0, 0.7);
+    border: 2px solid rgba(255, 215, 0, 0.3);
+    border-radius: 10px;
+    padding: 15px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.hairstyle-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.2), transparent);
+    transition: left 0.5s ease;
+}
+
+.hairstyle-card:hover::before {
+    left: 100%;
+}
+
+.hairstyle-card:hover {
+    transform: translateY(-5px);
+    border-color: gold;
+    box-shadow: 0 8px 25px rgba(255, 215, 0, 0.3);
+}
+
+.hairstyle-card.selected {
+    border-color: #00ff00;
+    box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
+}
+
+.hairstyle-icon {
+    font-size: 2.5em;
+    margin-bottom: 10px;
+    color: gold;
+}
+
+.hairstyle-name {
+    font-weight: bold;
+    margin-bottom: 8px;
+    font-size: 1.1em;
+}
+
+.hairstyle-info {
+    font-size: 0.8em;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 5px;
+}
+
+.compatibility {
+    font-size: 0.7em;
+    color: gold;
+    margin-top: 8px;
+}
+
+/* === AI DESCRIPTION PANEL === */
+.ai-panel {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.95), rgba(25, 25, 25, 0.95));
+    backdrop-filter: blur(15px);
+    border-top: 2px solid gold;
+    padding: 20px;
+    transform: translateY(100%);
+    transition: transform 0.3s ease;
+    z-index: 500;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.ai-panel.active {
+    transform: translateY(0);
+}
+
+.ai-panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.ai-panel-title {
+    color: gold;
+    font-size: 1.3em;
+    font-weight: bold;
+}
+
+.close-panel {
+    background: transparent;
+    border: 1px solid gold;
+    color: gold;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.close-panel:hover {
+    background: gold;
+    color: black;
+}
+
+.ai-content {
+    color: white;
+    line-height: 1.6;
+}
+
+/* === AI GENERATION SECTION === */
+.ai-generation {
+    margin-top: 20px;
+    padding: 20px;
+    background: rgba(255, 215, 0, 0.1);
+    border-radius: 10px;
+    border: 1px solid gold;
+}
+
+.generate-btn {
+    padding: 15px 30px;
+    background: linear-gradient(45deg, gold, #ffed4e);
+    color: black;
+    border: none;
+    border-radius: 25px;
+    font-weight: bold;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 15px auto;
+}
+
+.generate-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(255, 215, 0, 0.5);
+}
+
+.generate-btn.loading {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.generation-result {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.generated-image {
+    max-width: 300px;
+    border-radius: 10px;
+    border: 2px solid gold;
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+}
+
+/* === LOADING STATES === */
+.loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid transparent;
+    border-top: 2px solid gold;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* === RESPONSIVE DESIGN === */
+@media (max-width: 768px) {
+    .welcome-title { font-size: 2.5em; }
+    .hairstyle-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 15px; }
+    #videoContainer { width: 300px; height: 300px; }
+    .nav-bar { padding: 10px 15px; }
+    .filter-buttons { justify-content: center; }
+    .scan-controls { flex-direction: column; align-items: center; }
+}
+
+/* === CUSTOM SCROLLBAR === */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+::-webkit-scrollbar-thumb {
+    background: gold;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #ffed4e;
+}
+</style>
+</head>
+<body>
+
+<!-- Navigation Bar -->
+<div class="nav-bar">
+    <div class="logo">🎨 AI Hair Studio Pro</div>
+    <div>
+        <button class="nav-btn" onclick="goHome()">🏠 Home</button>
+        <button class="nav-btn" id="scanFaceNav" onclick="startFaceScan()">📸 Scan Face</button>
+        <button class="nav-btn" onclick="showHairstyles()">💇 Hairstyles</button>
+    </div>
+</div>
+
+<!-- Welcome Screen -->
+<div id="welcomeScreen" class="screen active">
+    <h1 class="welcome-title">AI Hair Studio</h1>
+    <p class="welcome-subtitle">Discover your perfect hairstyle with cutting-edge AI technology</p>
+    <button class="start-btn" onclick="startFaceScan()">
+        ✨ Start Your Journey
+    </button>
+    <div style="margin-top: 40px; color: rgba(255,255,255,0.6);">
+        <p>🎯 AI-Powered Face Analysis</p>
+        <p>💫 50+ Premium Hairstyles</p>
+        <p>🎨 3D Virtual Try-On</p>
+        <p>🤖 Personalized AI Generation</p>
+    </div>
+</div>
+
+<!-- Face Scan Screen -->
+<div id="faceScanScreen" class="screen">
+    <h2 style="text-align: center; color: gold; font-size: 2.5em; margin-bottom: 20px;">
+        🔬 AI Face Analysis
+    </h2>
+    
+    <div class="scan-container">
+        <div id="videoContainer">
+            <video id="video" autoplay muted></video>
+            <canvas id="canvas" style="display: none;"></canvas>
+            
+            <div class="scanning-overlay">
+                <div class="scan-line" id="scanLine"></div>
+                <div class="face-detection-box" id="faceBox"></div>
+            </div>
+        </div>
+        
+        <div class="scan-status" id="scanStatus">Click "Start Scan" to begin face analysis</div>
+        
+        <div class="scan-controls">
+            <button class="nav-btn" onclick="startCamera()" id="startScanBtn">
+                🎥 Start Scan
+            </button>
+            <button class="nav-btn" onclick="captureAndAnalyze()" id="analyzeBtn" style="display: none;">
+                🤖 Analyze Face
+            </button>
+            <button class="nav-btn" onclick="skipScan()">
+                ⏭️ Skip & Choose Manually
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Face Shape Selection Screen -->
+<div id="faceShapeScreen" class="screen">
+    <h2 style="text-align: center; color: gold; font-size: 2.5em; margin: 20px 0;">
+        👤 Select Your Face Shape
+    </h2>
+    
+    <div class="face-shape-grid">
+        <div class="face-shape-card" onclick="selectFaceShape('oval')">
+            <div class="face-shape-icon">🥚</div>
+            <h3>Oval</h3>
+            <p>Balanced proportions, slightly longer than wide. Most versatile face shape for hairstyles.</p>
+        </div>
+        
+        <div class="face-shape-card" onclick="selectFaceShape('heart')">
+            <div class="face-shape-icon">💖</div>
+            <h3>Heart</h3>
+            <p>Wider forehead, narrow chin. Perfect for styles that add volume to the lower face.</p>
+        </div>
+        
+        <div class="face-shape-card" onclick="selectFaceShape('square')">
+            <div class="face-shape-icon">⬜</div>
+            <h3>Square</h3>
+            <p>Strong jawline, similar width and height. Great with soft, layered styles.</p>
+        </div>
+        
+        <div class="face-shape-card" onclick="selectFaceShape('round')">
+            <div class="face-shape-icon">⭕</div>
+            <h3>Round</h3>
+            <p>Soft curves, equal width and height. Works well with angular cuts and height on top.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Main Hairstyle Screen -->
+<div id="hairstyleScreen" class="screen">
+    <!-- 3D Model Container -->
+    <div id="modelContainer">
+        <div style="text-align: center;">
+            <h3 style="color: gold; margin-bottom: 10px;">3D Virtual Try-On</h3>
+            <p>Select a hairstyle to preview in 3D</p>
+        </div>
+        <div class="model-controls">
+            <button class="control-btn" title="Reset View" onclick="resetCamera()">🏠</button>
+            <button class="control-btn" title="Zoom In" onclick="zoomIn()">🔍</button>
+            <button class="control-btn" title="Zoom Out" onclick="zoomOut()">🔍</button>
+        </div>
+    </div>
+    
+    <!-- Filters Section -->
+    <div class="filters-section">
+        <div class="filter-group">
+            <h4>📏 Length</h4>
+            <div class="filter-buttons">
+                <button class="filter-btn active" data-filter="all" onclick="filterByLength('all')">All</button>
+                <button class="filter-btn" data-filter="short" onclick="filterByLength('short')">Short</button>
+                <button class="filter-btn" data-filter="medium" onclick="filterByLength('medium')">Medium</button>
+                <button class="filter-btn" data-filter="long" onclick="filterByLength('long')">Long</button>
+            </div>
+        </div>
+        
+        <div class="filter-group">
+            <h4>🎯 Recommendation</h4>
+            <div class="filter-buttons">
+                <button class="filter-btn active" data-filter="all" onclick="filterByRecommendation('all')">All Styles</button>
+                <button class="filter-btn" data-filter="recommended" onclick="filterByRecommendation('recommended')">AI Recommended</button>
+                <button class="filter-btn" data-filter="trending" onclick="filterByRecommendation('trending')">Trending</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Hairstyle Categories -->
+    <div id="categoriesContainer"></div>
+</div>
+
+<!-- AI Description Panel -->
+<div class="ai-panel" id="aiPanel">
+    <div class="ai-panel-header">
+        <div class="ai-panel-title">🤖 AI Hairstyle Analysis</div>
+        <button class="close-panel" onclick="closeAIPanel()">✕</button>
+    </div>
+    <div class="ai-content" id="aiContent">
+        Select a hairstyle to see AI-powered analysis and recommendations.
+    </div>
+    
+    <div class="ai-generation">
+        <h4 style="color: gold; margin-bottom: 15px;">🎨 AI Image Generation</h4>
+        <p style="margin-bottom: 15px;">Generate a realistic preview of how you'll look with this hairstyle!</p>
+        <button class="generate-btn" id="generateBtn" onclick="generateAIImage()">
+            <span>🎨</span>
+            <span id="generateText">Generate My Look</span>
+        </button>
+        <div class="generation-result" id="generationResult"></div>
+    </div>
+</div>
+
+<script>
+// === GLOBAL VARIABLES ===
+let currentFaceShape = null;
+let currentFilters = { length: 'all', recommendation: 'all' };
+let selectedHairstyle = null;
+let isGenerating = false;
+
+// === COMPREHENSIVE HAIRSTYLE DATABASE ===
+const hairstyles = {
+    classic: [
+        { name: "Classic Bob", icon: "💇‍♀️", length: "short", difficulty: "Easy", maintenance: "Low", compatibility: ["oval", "heart", "square"], trending: false },
+        { name: "Pixie Cut", icon: "✂️", length: "short", difficulty: "Medium", maintenance: "Medium", compatibility: ["oval", "heart"], trending: false },
+        { name: "French Bob", icon: "🎭", length: "short", difficulty: "Medium", maintenance: "Medium", compatibility: ["oval", "square"], trending: true },
+        { name: "Blunt Bob", icon: "📐", length: "medium", difficulty: "Easy", maintenance: "Low", compatibility: ["oval", "square"], trending: false },
+        { name: "A-Line Bob", icon: "📐", length: "medium", difficulty: "Medium", maintenance: "Medium", compatibility: ["oval", "heart"], trending: false },
+        { name: "Classic Updo", icon: "👑", length: "long", difficulty: "Hard", maintenance: "High", compatibility: ["oval", "heart", "square"], trending: false },
+        { name: "Vintage Waves", icon: "🌊", length: "medium", difficulty: "Hard", maintenance: "High", compatibility: ["oval", "heart"], trending: false },
+        { name: "Side Part", icon: "🔄", length: "medium", difficulty: "Easy", maintenance: "Low", compatibility: ["oval", "square"], trending: false }
+    ],
+    modern: [
+        { name: "Asymmetrical Bob", icon: "🔺", length: "short", difficulty: "Hard", maintenance: "High", compatibility: ["oval", "heart"], trending: true },
+        { name: "Textured Lob", icon: "🌀", length: "medium", difficulty: "Medium", maintenance: "Medium", compatibility: ["oval", "square"], trending: true },
+        { name: "Shag Cut", icon: "✨", length: "medium", difficulty: "Medium", maintenance: "Medium", compatibility: ["oval", "heart"], trending: true },
+        { name: "Wolf Cut", icon: "🐺", length: "medium", difficulty: "Hard", maintenance: "High", compatibility: ["oval", "heart"], trending: true },
+        { name: "Buzz Cut", icon: "⚡", length: "short", difficulty: "Easy", maintenance: "Low", compatibility: ["oval", "square"], trending: false },
+        { name: "Undercut", icon: "🔥", length: "short", difficulty: "Medium", maintenance: "High", compatibility: ["square"], trending: true },
+        { name: "Tousled Waves", icon: "🌊", length: "medium", difficulty: "Easy", maintenance: "Low", compatibility: ["oval", "heart"], trending: true },
+        { name: "Sleek Straight", icon: "📏", length: "long", difficulty: "Medium", maintenance: "High", compatibility: ["oval", "square"], trending: false }
+    ],
+    trendy: [
+        { name: "E-Girl Bangs", icon: "🎌", length: "medium", difficulty: "Hard", maintenance: "High", compatibility: ["heart"], trending: true },
+        { name: "Curtain Bangs", icon: "🎭", length: "medium", difficulty: "Medium", maintenance: "Medium", compatibility: ["oval", "heart"], trending: true },
+        { name: "Money Piece", icon: "💰", length: "long", difficulty: "Hard", maintenance: "High", compatibility: ["oval", "heart"], trending: true },
+        { name: "Space Buns", icon: "🌌", length: "medium", difficulty: "Easy", maintenance: "Low", compatibility: ["oval", "round"], trending: true },
+        { name: "Butterfly Cut", icon: "🦋", length: "long", difficulty: "Medium", maintenance: "Medium", compatibility: ["oval", "heart"], trending: true },
+        { name: "Hime Cut", icon: "👸", length: "long", difficulty: "Hard", maintenance: "High", compatibility: ["heart"], trending: true },
+        { name: "Mullet", icon: "🤘", length: "medium", difficulty: "Hard", maintenance: "High", compatibility: ["oval", "square"], trending: true },
+        { name: "Two-Tone Bob", icon: "🎨", length: "short", difficulty: "Hard", maintenance: "High", compatibility: ["oval", "square"], trending: true }
+    ],
+    formal: [
+        { name: "Chignon", icon: "💼", length: "long", difficulty: "Hard", maintenance: "High", compatibility: ["oval", "heart", "square"], trending: false },
+        { name: "French Twist", icon: "🥖", length: "long", difficulty: "Hard", maintenance: "High", compatibility: ["oval", "heart"], trending: false },
+        { name: "Low Bun", icon: "🔽", length: "long", difficulty: "Medium", maintenance: "Medium", compatibility: ["oval", "heart", "square"], trending: false },
+        { name: "Braided Crown", icon: "👑", length: "long", difficulty: "Hard", maintenance: "High", compatibility: ["oval", "heart"], trending: false },
+        { name: "Sleek Ponytail", icon: "🐴", length: "long", difficulty: "Easy", maintenance: "Low", compatibility: ["oval", "square"], trending: false },
+        { name: "Gibson Tuck", icon: "🎩", length: "medium", difficulty: "Medium", maintenance: "Medium", compatibility: ["oval", "heart"], trending: false }
+    ]
+};
+
+// === NAVIGATION FUNCTIONS ===
+function goHome() {
+    showScreen('welcomeScreen');
+    closeAIPanel();
+}
+
+function startFaceScan() {
+    showScreen('faceScanScreen');
+    closeAIPanel();
+}
+
+function showHairstyles() {
+    showScreen('hairstyleScreen');
+    renderHairstyles();
+    closeAIPanel();
+}
+
+function showScreen(screenId) {
+    document.querySelectorAll('.screen').forEach(screen => {
+        screen.classList.remove('active');
+    });
+    document.getElementById(screenId).classList.add('active');
+}
+
+// === FACE SCANNING FUNCTIONS ===
+function startCamera() {
+    const video = document.getElementById('video');
+    const startBtn = document.getElementById('startScanBtn');
+    const analyzeBtn = document.getElementById('analyzeBtn');
+    const status = document.getElementById('scanStatus');
+    const scanLine = document.getElementById('scanLine');
+
+    navigator.mediaDevices.getUserMedia({ video: true })
+        .then(stream => {
+            video.srcObject = stream;
+            startBtn.style.display = 'none';
+            analyzeBtn.style.display = 'inline-block';
+            status.textContent = 'Camera ready! Position your face in the frame and click "Analyze Face"';
+            scanLine.style.display = 'block';
+            simulateFaceDetection();
+        })
+        .catch(err => {
+            console.error('Camera access denied:', err);
+            status.textContent = 'Camera access denied. Please allow camera access or skip to manual selection.';
+            status.style.color = '#ff6b6b';
+        });
+}
+
+function simulateFaceDetection() {
+    const faceBox = document.getElementById('faceBox');
+    
+    setTimeout(() => {
+        faceBox.style.display = 'block';
+        faceBox.style.left = '25%';
+        faceBox.style.top = '20%';
+        faceBox.style.width = '50%';
+        faceBox.style.height = '60%';
+        
+        document.getElementById('scanStatus').textContent = 'Face detected! Click "Analyze Face" to continue.';
+        document.getElementById('scanStatus').style.color = '#00ff00';
+    }, 2000);
+}
+
+function captureAndAnalyze() {
+    const status = document.getElementById('scanStatus');
+    const analyzeBtn = document.getElementById('analyzeBtn');
+    
+    analyzeBtn.innerHTML = '<div class="loading"><div class="spinner"></div> Analyzing...</div>';
+    status.textContent = 'AI is analyzing your face shape...';
+    status.style.color = 'gold';
+    
+    // Simulate AI analysis
+    setTimeout(() => {
+        const shapes = ['oval', 'heart', 'square', 'round'];
+        const detectedShape = shapes[Math.floor(Math.random() * shapes.length)];
+        
+        currentFaceShape = detectedShape;
+        status.textContent = `Analysis complete! Detected face shape: ${detectedShape.charAt(0).toUpperCase() + detectedShape.slice(1)}`;
+        status.style.color = '#00ff00';
+        
+        setTimeout(() => {
+            showHairstyles();
+        }, 2000);
+    }, 3000);
+}
+
+function skipScan() {
+    showScreen('faceShapeScreen');
+}
+
+function selectFaceShape(shape) {
+    currentFaceShape = shape;
+    showHairstyles();
+}
+
+// === FILTER FUNCTIONS ===
+function filterByLength(length) {
+    currentFilters.length = length;
+    updateFilterButtons('length', length);
+    renderHairstyles();
+}
+
+function filterByRecommendation(type) {
+    currentFilters.recommendation = type;
+    updateFilterButtons('recommendation', type);
+    renderHairstyles();
+}
+
+function updateFilterButtons(filterType, activeValue) {
+    const buttons = document.querySelectorAll(`[onclick*="filter${filterType.charAt(0).toUpperCase() + filterType.slice(1)}"]`);
+    buttons.forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.getAttribute('data-filter') === activeValue || 
+            (filterType === 'length' && btn.textContent.toLowerCase() === activeValue) ||
+            (filterType === 'recommendation' && btn.textContent.toLowerCase().includes(activeValue))) {
+            btn.classList.add('active');
+        }
+    });
+}
+
+// === HAIRSTYLE RENDERING ===
+function renderHairstyles() {
+    const container = document.getElementById('categoriesContainer');
+    container.innerHTML = '';
+    
+    Object.keys(hairstyles).forEach(category => {
+        const filteredStyles = filterHairstyles(hairstyles[category]);
+        
+        if (filteredStyles.length > 0) {
+            const categoryElement = createCategoryElement(category, filteredStyles);
+            container.appendChild(categoryElement);
+        }
+    });
+}
+
+function filterHairstyles(styles) {
+    return styles.filter(style => {
+        // Filter by length
+        if (currentFilters.length !== 'all' && style.length !== currentFilters.length) {
+            return false;
+        }
+        
+        // Filter by recommendation
+        if (currentFilters.recommendation === 'recommended' && currentFaceShape) {
+            return style.compatibility.includes(currentFaceShape);
+        } else if (currentFilters.recommendation === 'trending') {
+            return style.trending;
+        }
+        
+        return true;
+    });
+}
+
+function createCategoryElement(category, styles) {
+    const section = document.createElement('div');
+    section.className = 'category-section';
+    
+    const header = document.createElement('div');
+    header.className = 'category-header';
+    header.onclick = () => toggleCategory(section);
+    
+    const categoryIcons = {
+        classic: '🏛️',
+        modern: '🔮',
+        trendy: '🌟',
+        formal: '🎩'
+    };
+    
+    header.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 1.5em;">${categoryIcons[category] || '💇'}</span>
+            <div class="category-title">${category.charAt(0).toUpperCase() + category.slice(1)} Styles</div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <div class="category-count">${styles.length} styles</div>
+            <div class="expand-icon">▼</div>
+        </div>
+    `;
+    
+    const content = document.createElement('div');
+    content.className = 'category-content';
+    
+    const grid = document.createElement('div');
+    grid.className = 'hairstyle-grid';
+    
+    styles.forEach(style => {
+        const card = createHairstyleCard(style);
+        grid.appendChild(card);
+    });
+    
+    content.appendChild(grid);
+    section.appendChild(header);
+    section.appendChild(content);
+    
+    return section;
+}
+
+function createHairstyleCard(style) {
+    const card = document.createElement('div');
+    card.className = 'hairstyle-card';
+    card.onclick = () => selectHairstyle(style, card);
+    
+    const isRecommended = currentFaceShape && style.compatibility.includes(currentFaceShape);
+    const compatibilityText = isRecommended ? '✅ Perfect Match!' : `Best for: ${style.compatibility.join(', ')}`;
+    
+    card.innerHTML = `
+        <div class="hairstyle-icon">${style.icon}</div>
+        <div class="hairstyle-name">${style.name}</div>
+        <div class="hairstyle-info">Length: ${style.length}</div>
+        <div class="hairstyle-info">Difficulty: ${style.difficulty}</div>
+        <div class="hairstyle-info">Maintenance: ${style.maintenance}</div>
+        <div class="compatibility">${compatibilityText}</div>
+        ${style.trending ? '<div style="color: #ff6b6b; font-size: 0.8em; margin-top: 5px;">🔥 TRENDING</div>' : ''}
+    `;
+    
+    return card;
+}
+
+function toggleCategory(section) {
+    section.classList.toggle('expanded');
+}
+
+// === HAIRSTYLE SELECTION ===
+function selectHairstyle(style, cardElement) {
+    // Remove previous selection
+    document.querySelectorAll('.hairstyle-card.selected').forEach(card => {
+        card.classList.remove('selected');
+    });
+    
+    // Select new card
+    cardElement.classList.add('selected');
+    selectedHairstyle = style;
+    
+    // Show AI panel with analysis
+    showAIAnalysis(style);
+    
+    // Update 3D model (placeholder)
+    updateVirtualTryOn(style);
+}
+
+function showAIAnalysis(style) {
+    const panel = document.getElementById('aiPanel');
+    const content = document.getElementById('aiContent');
+    
+    const isRecommended = currentFaceShape && style.compatibility.includes(currentFaceShape);
+    const recommendation = isRecommended ? 
+        "🎯 Perfect match for your face shape!" : 
+        "⚠️ This style might not be optimal for your face shape, but it's still a great choice!";
+    
+    const maintenanceTips = {
+        'Low': 'Wash and go! Minimal styling required.',
+        'Medium': 'Regular trims and basic styling needed.',
+        'High': 'Daily styling and frequent salon visits required.'
+    };
+    
+    const difficultyInfo = {
+        'Easy': 'Great for beginners! Simple to maintain.',
+        'Medium': 'Moderate skill required for styling.',
+        'Hard': 'Professional styling recommended.'
+    };
+    
+    content.innerHTML = `
+        <h3 style="color: gold; margin-bottom: 15px;">${style.icon} ${style.name}</h3>
+        
+        <div style="margin-bottom: 15px;">
+            <strong style="color: gold;">AI Recommendation:</strong><br>
+            ${recommendation}
+        </div>
+        
+        <div style="margin-bottom: 15px;">
+            <strong style="color: gold;">Style Details:</strong><br>
+            📏 Length: ${style.length}<br>
+            🎯 Difficulty: ${style.difficulty} - ${difficultyInfo[style.difficulty]}<br>
+            🔧 Maintenance: ${style.maintenance} - ${maintenanceTips[style.maintenance]}
+        </div>
+        
+        <div style="margin-bottom: 15px;">
+            <strong style="color: gold;">Face Shape Compatibility:</strong><br>
+            Best for: ${style.compatibility.map(shape => shape.charAt(0).toUpperCase() + shape.slice(1)).join(', ')}
+        </div>
+        
+        ${style.trending ? '<div style="color: #ff6b6b; font-weight: bold;">🔥 This is a trending style right now!</div>' : ''}
+        
+        <div style="margin-top: 15px; padding: 10px; background: rgba(255, 215, 0, 0.1); border-radius: 5px;">
+            <strong style="color: gold;">💡 Styling Tips:</strong><br>
+            ${getStyleTips(style)}
+        </div>
+    `;
+    
+    panel.classList.add('active');
+}
+
+function getStyleTips(style) {
+    const tips = {
+        "Classic Bob": "Use a round brush for volume. Apply heat protectant before blow-drying.",
+        "Pixie Cut": "Use texturizing paste for definition. Regular trims every 4-6 weeks are essential.",
+        "French Bob": "Blow-dry with a flat brush for that signature blunt look. Use smoothing serum.",
+        "Asymmetrical Bob": "Emphasize the longer side with loose curls. Use styling cream for texture.",
+        "Wolf Cut": "Scrunch with mousse for natural texture. Air dry or use a diffuser.",
+        "Curtain Bangs": "Blow-dry bangs with a round brush, sweeping to each side. Use light hold spray."
+    };
+    
+    return tips[style.name] || "Consult with your stylist for personalized styling tips based on your hair type.";
+}
+
+function updateVirtualTryOn(style) {
+    const modelContainer = document.getElementById('modelContainer');
+    modelContainer.innerHTML = `
+        <div style="text-align: center;">
+            <h3 style="color: gold; margin-bottom: 10px;">3D Virtual Try-On</h3>
+            <div style="font-size: 4em; margin: 20px 0;">${style.icon}</div>
+            <p style="font-size: 1.2em; margin-bottom: 10px;">${style.name}</p>
+            <p style="color: rgba(255, 255, 255, 0.7);">3D preview coming soon!</p>
+            <p style="color: rgba(255, 255, 255, 0.5); font-size: 0.9em; margin-top: 20px;">
+                Use the AI Image Generator below to see a realistic preview
+            </p>
+        </div>
+        <div class="model-controls">
+            <button class="control-btn" title="Reset View" onclick="resetCamera()">🏠</button>
+            <button class="control-btn" title="Zoom In" onclick="zoomIn()">🔍</button>
+            <button class="control-btn" title="Zoom Out" onclick="zoomOut()">🔍</button>
+        </div>
+    `;
+}
+
+// === AI PANEL FUNCTIONS ===
+function closeAIPanel() {
+    document.getElementById('aiPanel').classList.remove('active');
+}
+
+function generateAIImage() {
+    if (!selectedHairstyle || isGenerating) return;
+    
+    const generateBtn = document.getElementById('generateBtn');
+    const generateText = document.getElementById('generateText');
+    const result = document.getElementById('generationResult');
+    
+    isGenerating = true;
+    generateBtn.classList.add('loading');
+    generateText.innerHTML = '<div class="spinner"></div> Generating...';
+    
+    // Simulate AI image generation
+    setTimeout(() => {
+        // Create placeholder image
+        const canvas = document.createElement('canvas');
+        canvas.width = 300;
+        canvas.height = 400;
+        const ctx = canvas.getContext('2d');
+        
+        // Create gradient background
+        const gradient = ctx.createLinearGradient(0, 0, 300, 400);
+        gradient.addColorStop(0, '#2c3e50');
+        gradient.addColorStop(1, '#34495e');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, 300, 400);
+        
+        // Add text
+        ctx.fillStyle = 'white';
+        ctx.font = 'bold 20px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('AI Generated Preview', 150, 50);
+        
+        ctx.font = '16px Arial';
+        ctx.fillText(selectedHairstyle.name, 150, 80);
+        
+        // Add hairstyle icon
+        ctx.font = '100px Arial';
+        ctx.fillText(selectedHairstyle.icon, 150, 200);
+        
+        ctx.font = '14px Arial';
+        ctx.fillStyle = '#f39c12';
+        ctx.fillText('Preview based on AI analysis', 150, 350);
+        ctx.fillText('Results may vary', 150, 370);
+        
+        const imageDataUrl = canvas.toDataURL();
+        
+        result.innerHTML = `
+            <img src="${imageDataUrl}" alt="AI Generated Preview" class="generated-image">
+            <div style="margin-top: 15px; color: rgba(255, 255, 255, 0.8);">
+                <p>✨ AI-generated preview of ${selectedHairstyle.name}</p>
+                <p style="font-size: 0.9em; margin-top: 10px;">
+                    Save this image and show it to your stylist for the best results!
+                </p>
+            </div>
+        `;
+        
+        generateBtn.classList.remove('loading');
+        generateText.textContent = 'Generate Again';
+        isGenerating = false;
+    }, 3000);
+}
+
+// === 3D MODEL CONTROLS ===
+function resetCamera() {
+    console.log('Resetting camera view');
+    // Placeholder for 3D camera reset
+}
+
+function zoomIn() {
+    console.log('Zooming in');
+    // Placeholder for 3D zoom in
+}
+
+function zoomOut() {
+    console.log('Zooming out');
+    // Placeholder for 3D zoom out
+}
+
+// === INITIALIZATION ===
+document.addEventListener('DOMContentLoaded', function() {
+    // Set default face shape for demo
+    if (!currentFaceShape) {
+        currentFaceShape = 'oval';
+    }
+    
+    // Render hairstyles when page loads
+    renderHairstyles();
+    
+    // Add keyboard navigation
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeAIPanel();
+        }
+    });
+    
+    // Auto-expand first category
+    setTimeout(() => {
+        const firstCategory = document.querySelector('.category-section');
+        if (firstCategory) {
+            firstCategory.classList.add('expanded');
+        }
+    }, 500);
+});
+
+// === DEMO MODE ENHANCEMENTS ===
+function showDemoNotification() {
+    const notification = document.createElement('div');
+    notification.style.cssText = `
+        position: fixed;
+        top: 100px;
+        right: 20px;
+        background: linear-gradient(45deg, gold, #ffed4e);
+        color: black;
+        padding: 15px 20px;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3);
+        z-index: 1001;
+        font-weight: bold;
+        opacity: 0;
+        transform: translateX(100%);
+        transition: all 0.3s ease;
+    `;
+    notification.innerHTML = '🎯 AI analysis complete! Check out recommended styles.';
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.opacity = '1';
+        notification.style.transform = 'translateX(0)';
+    }, 100);
+    
+    setTimeout(() => {
+        notification.style.opacity = '0';
+        notification.style.transform = 'translateX(100%)';
+        setTimeout(() => notification.remove(), 300);
+    }, 4000);
+}
+
+// Trigger demo notification when hairstyles are first shown
+let hasShownDemo = false;
+const originalShowHairstyles = showHairstyles;
+showHairstyles = function() {
+    originalShowHairstyles();
+    if (!hasShownDemo && currentFaceShape) {
+        setTimeout(showDemoNotification, 1000);
+        hasShownDemo = true;
+    }
+};
+</script>
+
+</body>
+</html>
